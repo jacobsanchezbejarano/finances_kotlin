@@ -10,7 +10,7 @@ The purpose of the software is to help people manage their finances better.
 
 # Development Environment
 
-To develop this software I used Android Studio, Git, and GitHub.
+To develop this software I used Android Studio, Git, GitHub, and SQLite.
 
 I used Kotlin for all the code.
 
