@@ -6,7 +6,9 @@ The software tries to provide a complete view of the user's finances. It conside
 
 The purpose of the software is to help people manage their finances better.
 
-[Software Demo Video](https://youtu.be/1zRDczghcLs)
+[General idea demo - Video](https://youtu.be/1zRDczghcLs)
+[Demo and basic structure - Video](https://youtu.be/RIPK60265nU)
+[Detailed explanation of key features - Video](https://youtu.be/tYXKHcDLYAU)
 
 # Development Environment
 
