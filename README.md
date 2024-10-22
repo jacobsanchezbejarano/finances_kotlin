@@ -10,6 +10,12 @@ The purpose of the software is to help people manage their finances better.
 [Demo and basic structure - Video](https://youtu.be/RIPK60265nU)
 [Detailed explanation of key features - Video](https://youtu.be/tYXKHcDLYAU)
 
+# Future Work
+
+- To implement a cloud database.
+- To improve the user experience, automating common type of transactions.
+- To implement user authentication.
+
 # Development Environment
 
 To develop this software I used Android Studio, Git, GitHub, and SQLite.
