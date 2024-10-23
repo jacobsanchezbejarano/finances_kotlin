@@ -6,6 +6,8 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
+import com.google.firebase.database.FirebaseDatabase
+
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
@@ -64,6 +66,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         }
 
         return db.insert(TABLE_ACCOUNTS, null, values).also {
+            syncAccountsWithCloudDatabase()
             db.close()
         }
     }
@@ -106,6 +109,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         }
 
         return db.insert(TABLE_TRANSACTIONS, null, values).also {
+            syncTransactionsWithCloudDatabase()
             db.close()
         }
     }
@@ -138,5 +142,57 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         cursor.close()
         db.close()
         return transactions
+    }
+
+    // Function to sync accounts with cloud real time database
+    private fun syncAccountsWithCloudDatabase() {
+        // Get reference to the Realtime Database
+        val dbRealtime = FirebaseDatabase.getInstance(CLOUD_DATABASE).reference
+        val accounts = getAllAccounts()
+
+        for (account in accounts) {
+            val accountData = mapOf(
+                "id" to account.id,
+                "code" to account.code,
+                "name" to account.name
+            )
+
+            dbRealtime.child("accounts")
+                .child(account.id.toString())
+                .setValue(accountData)
+                .addOnSuccessListener {
+                    println("Account synchronized successfully: ${account.name}")
+                }
+                .addOnFailureListener { e ->
+                    println("Error syncing account: ${e.message}")
+                }
+        }
+    }
+
+    // Function to sync transactions with cloud real time database
+    private fun syncTransactionsWithCloudDatabase() {
+        // Get reference to the Realtime Database
+        val dbRealtime = FirebaseDatabase.getInstance(CLOUD_DATABASE).reference
+        val transactions = getAllTransactions()
+
+        for (transaction in transactions) {
+            val transactionData = mapOf(
+                "id" to transaction.id,
+                "code" to transaction.code,
+                "amount" to transaction.amount,
+                "type" to transaction.type.toString(),
+                "date" to transaction.date
+            )
+
+            dbRealtime.child("transactions")
+                .child(transaction.id.toString())
+                .setValue(transactionData)
+                .addOnSuccessListener {
+                    println("Transaction synchronized successfully: ${transaction.id}")
+                }
+                .addOnFailureListener { e ->
+                    println("Error syncing transaction: ${e.message}")
+                }
+        }
     }
 }

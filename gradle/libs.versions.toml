@@ -26,8 +26,9 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 navigation-compose = "androidx.navigation:navigation-compose:2.6.0"
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version = "20.2.1" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-
+google-services = { id = "com.google.gms.google-services", version = "4.3.15" }
