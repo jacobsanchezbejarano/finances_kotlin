@@ -1,6 +1,7 @@
 // MainActivity.kt
 package com.devssoft.accounting
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -12,7 +13,6 @@ import com.google.firebase.FirebaseApp
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,30 +43,40 @@ class MainActivity : ComponentActivity() {
         authManager.initAuth()
 
         setContent {
-            // State variable to track if the user is signed in
-            var isSignedIn by remember { mutableStateOf(authManager.isUserSignedIn()) }
-            var userName by remember { mutableStateOf("User") }
+
+            // Load the session state
+            val (savedSignInStatus, savedUserName) = SessionManager.loadUserSession(this)
+
+            var isSignedIn by remember { mutableStateOf(savedSignInStatus) }
+            var userName by remember { mutableStateOf(savedUserName) }
 
             if (authManager.isUserSignedIn()) {
                 // Load the main app if the user is signed in
                 userName = authManager.getCurrentUser()?.displayName ?: "User"
             }
             if (isSignedIn) {
-                // Show the main app if the user is signed in and has a valid name
+                // Show the main app if the user is signed in
                 AccountingApp(userName = userName) {
+                    // Handle sign out
                     authManager.signOut()
                     isSignedIn = false
                     userName = "User" // Reset the user name on logout
-                }
 
+                    // Save the session state
+                    SessionManager.saveUserSession(this, isSignedIn, userName)
+                }
             } else {
                 // Show the Google sign-in screen
                 SignInScreen(authManager) { account ->
-                    // Proceed to the main app if sign-in is successful
+                    // Sign-in was successful
                     Log.d("SignIn", "Sign-in successful: ${account.displayName}")
+
                     // Update the userName with the account's display name
                     userName = account.displayName ?: "User"
-                    isSignedIn = true // Update the state to reflect the user is signed in
+                    isSignedIn = true // Update the state to reflect that user is signed in
+
+                    // Save the session state
+                    SessionManager.saveUserSession(this, isSignedIn, userName)
                 }
             }
         }
@@ -93,7 +103,7 @@ fun SignInScreen(authManager: Auth, onSignInSuccess: (GoogleSignInAccount) -> Un
     val signInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == android.app.Activity.RESULT_OK) {
+        if (result.resultCode == Activity.RESULT_OK) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
                 val account = task.getResult(ApiException::class.java)
@@ -113,9 +123,9 @@ fun SignInScreen(authManager: Auth, onSignInSuccess: (GoogleSignInAccount) -> Un
             val signInIntent = authManager.getSignInIntent()
             signInLauncher.launch(signInIntent) // Launch the sign-in intent
         })
-
     }
 }
+
 
 @Composable
 fun GoogleSignInButton(onClick: () -> Unit) {
