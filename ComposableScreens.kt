@@ -9,7 +9,7 @@ import androidx.navigation.compose.*
 
 
 @Composable
-fun AccountingApp(userName: String) {
+fun AccountingApp(userName: String, onLogout: () -> Unit) {
 
     AccountingTheme {
         val navController = rememberNavController()
@@ -26,7 +26,8 @@ fun AccountingApp(userName: String) {
                     onNavigateToAccounts = {
                         navController.navigate(Screen.Accounts.route)
                     },
-                    userName
+                    userName,
+                    onLogout
                 )
             }
             composable(Screen.Transactions.route) {

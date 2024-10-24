@@ -9,6 +9,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import java.text.SimpleDateFormat
 import java.util.*
@@ -19,7 +20,8 @@ fun HomeScreen(
     onNavigateToTransactions: () -> Unit = {},
     onNavigateToAnalysis: () -> Unit = {},
     onNavigateToAccounts: () -> Unit = {},
-    userName: String
+    userName: String,
+    onLogout: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -202,6 +204,26 @@ fun HomeScreen(
         Button(onClick = onNavigateToAccounts, modifier = Modifier.fillMaxWidth()) {
             Text(text = "View Accounts")
         }
+
+        // Spacer to push the logout button to the bottom
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Logout button at the bottom
+        Button(
+            onClick = {
+                onLogout() // Call the passed logout function
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Red, // Set the button background color
+                contentColor = Color.White // Set the text color
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp) // Optional: Add padding for better layout
+        ) {
+            Text(text = "Logout")
+        }
+
 
     }
 
