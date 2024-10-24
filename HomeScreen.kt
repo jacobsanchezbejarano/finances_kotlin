@@ -218,7 +218,7 @@ fun HomeScreen(
                 onLogout() // Call the passed logout function
             },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Red, // Set the button background color
+                containerColor = Color(0xFFDB4437), // Set the button background color
                 contentColor = Color.White // Set the text color
             ),
             modifier = Modifier
