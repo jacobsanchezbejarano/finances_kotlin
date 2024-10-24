@@ -1,13 +1,13 @@
 // MainActivity.kt
 package com.devssoft.accounting
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import com.devssoft.accounting.Auth
 import com.google.firebase.FirebaseApp
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
@@ -17,8 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.core.content.ContextCompat.startActivity
-import androidx.navigation.compose.*
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 
 class MainActivity : ComponentActivity() {
@@ -37,23 +35,45 @@ class MainActivity : ComponentActivity() {
         authManager.initAuth()
 
         setContent {
-
-            var userName by remember { mutableStateOf("") }
+            // Remember the user's name state
+            var userName by remember { mutableStateOf("User") } // Default name
 
             if (authManager.isUserSignedIn()) {
-                AccountingApp(userName)
-            } else {
+                // Load the main app if the user is signed in
+                userName = authManager.getCurrentUser()?.displayName ?: "User"
+            }
+
+
+            // Call the AccountingApp composable to show the main UI
+            if (userName != "User") {
+                // Show the main app if the user is signed in and has a valid name
+                AccountingApp(userName = userName)
+            }else{
                 // Show the Google sign-in screen
-                SignInScreen(authManager, onSignInSuccess = { account ->
+                SignInScreen(authManager) { account ->
                     // Proceed to the main app if sign-in is successful
-                    userName = account.displayName.toString()
                     Log.d("SignIn", "Sign-in successful: ${account.displayName}")
-                    setContent { AccountingApp(userName) }
-                })
+                    // Update the userName with the account's display name
+                    userName = account.displayName ?: "User"
+                }
+            }
+        }
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == SIGN_IN_REQUEST_CODE) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            if (authManager.handleSignInResult(task)) {
+                // Sign-in was successful, update UI
+            } else {
+                // Sign-in failed, handle error
             }
         }
     }
 }
+
 
 @Composable
 fun SignInScreen(authManager: Auth, onSignInSuccess: (GoogleSignInAccount) -> Unit) {
@@ -85,3 +105,4 @@ fun SignInScreen(authManager: Auth, onSignInSuccess: (GoogleSignInAccount) -> Un
         }
     }
 }
+

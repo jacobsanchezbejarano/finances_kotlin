@@ -1,60 +1,63 @@
-// Auth.kt
 package com.devssoft.accounting
 
-import android.content.Context
+import android.app.Activity
 import android.content.Intent
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 
-class Auth(private val context: Context) {
-
+class Auth(private val activity: Activity) {
     private lateinit var googleSignInClient: GoogleSignInClient
-    private lateinit var firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
     fun initAuth() {
-        // Initialize FirebaseAuth
-        firebaseAuth = FirebaseAuth.getInstance()
-
-        // Configure Google Sign In options
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(context.getString(R.string.default_web_client_id)) // Reference to client ID
+            .requestIdToken(activity.getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
 
-        // Build a GoogleSignInClient with the options specified
-        googleSignInClient = GoogleSignIn.getClient(context, gso)
-    }
-
-    fun getSignInIntent(): Intent {
-        return googleSignInClient.signInIntent
-    }
-
-    fun handleSignInResult(account: GoogleSignInAccount, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-        firebaseAuth.signInWithCredential(credential)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // Sign in success
-                    onSuccess()
-                } else {
-                    // Sign in failure
-                    onFailure(task.exception ?: Exception("Sign in failed"))
-                }
-            }
+        googleSignInClient = GoogleSignIn.getClient(activity, gso)
     }
 
     fun isUserSignedIn(): Boolean {
         return firebaseAuth.currentUser != null
     }
 
-    fun signOut(onSuccess: () -> Unit) {
-        firebaseAuth.signOut()
-        googleSignInClient.signOut().addOnCompleteListener {
-            onSuccess()
+    fun getSignInIntent(): Intent {
+        return googleSignInClient.signInIntent
+    }
+
+    fun handleSignInResult(task: Task<GoogleSignInAccount>): Boolean {
+        return try {
+            val account = task.getResult(ApiException::class.java)!!
+            // Firebase authentication with Google
+            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+            firebaseAuth.signInWithCredential(credential).addOnCompleteListener { signInTask ->
+                if (signInTask.isSuccessful) {
+                    // Sign-in successful
+                } else {
+                    // Sign-in failed
+                }
+            }
+            true // Sign-in was successful
+        } catch (e: ApiException) {
+            false // Sign-in failed
         }
     }
+
+    fun signOut() {
+        firebaseAuth.signOut()
+        googleSignInClient.signOut()
+    }
+
+    fun getCurrentUser(): FirebaseUser? {
+        return firebaseAuth.currentUser
+    }
+
 }
