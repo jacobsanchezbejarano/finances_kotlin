@@ -45,8 +45,9 @@ fun HomeScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     // Function to add a transaction
-    fun addTransaction(transactionType: TransactionType) {
+    fun addTransaction(transactionType: TransactionType, entry: Int) {
         val newId = (transactions.maxOfOrNull { it.id } ?: 0) + 1
+
         val account = if (transactionType == TransactionType.DEBIT) selectedAccountDebit else selectedAccountCredit
         val amount = amountInput.toDoubleOrNull()
         val date = dateInput.ifEmpty { "2024-10-14 00:00:00" } // Default date
@@ -57,6 +58,7 @@ fun HomeScreen(
             else -> {
                 val newTransaction = Transaction(
                     id = newId,
+                    entry = entry,
                     code = account.code,
                     amount = amount,
                     type = transactionType,
@@ -171,12 +173,14 @@ fun HomeScreen(
         val calendar = Calendar.getInstance()
         val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
 
+        val newEntry = (transactions.maxOfOrNull { it.entry } ?: 0) + 1
+
         // Button to add Transaction
         Button(
             onClick = {
                 dateInput = currentDate
-                addTransaction(TransactionType.DEBIT)
-                addTransaction(TransactionType.CREDIT)
+                addTransaction(TransactionType.DEBIT, newEntry)
+                addTransaction(TransactionType.CREDIT, newEntry)
                 // Reset input fields
                 selectedAccountDebit = null
                 selectedAccountCredit = null
