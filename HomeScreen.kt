@@ -18,7 +18,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     onNavigateToTransactions: () -> Unit = {},
     onNavigateToAnalysis: () -> Unit = {},
-    onNavigateToAccounts: () -> Unit = {}
+    onNavigateToAccounts: () -> Unit = {},
+    userName: String
 ) {
 
     val context = LocalContext.current
@@ -88,6 +89,8 @@ fun HomeScreen(
 
         // State to hold the selected option
         var selectedOptionDebit by remember { mutableStateOf("Select an account") }
+
+        Text(text = "Welcome, $userName!", style = MaterialTheme.typography.headlineMedium)
 
         // Title for transaction input section
         Text("Add New Transaction", style = MaterialTheme.typography.titleMedium)

@@ -7,8 +7,9 @@ import androidx.compose.ui.Modifier
 import com.devssoft.accounting.ui.theme.AccountingTheme
 import androidx.navigation.compose.*
 
+
 @Composable
-fun AccountingApp() {
+fun AccountingApp(userName: String) {
 
     AccountingTheme {
         val navController = rememberNavController()
@@ -24,7 +25,8 @@ fun AccountingApp() {
                     },
                     onNavigateToAccounts = {
                         navController.navigate(Screen.Accounts.route)
-                    }
+                    },
+                    userName
                 )
             }
             composable(Screen.Transactions.route) {
