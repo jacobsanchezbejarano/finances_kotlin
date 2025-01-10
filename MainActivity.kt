@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
     companion object {
         private const val SIGN_IN_REQUEST_CODE = 1001 // Unique integer value
     }
-
+    @Override
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
